@@ -1,6 +1,8 @@
 package driverFactory;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import commonFunctions.FunctionLibrary;
@@ -14,6 +16,7 @@ public class DriverScript
 	String TCSheet = "MasterTestCases";
 	public void startTest() throws Throwable
 	{
+
 		String Module_Status = "";
 		String Module_New = "";
 		// create reference object for accessing excel methods
@@ -45,23 +48,35 @@ public class DriverScript
 						}
 						if(ObjectType.equalsIgnoreCase("waitForElement"))
 						{
-							FunctionLibrary.waitForElement(Ltype, Lvalue, TestData);;
+							FunctionLibrary.waitForElement(Ltype, Lvalue, TestData);
 						}
 						if(ObjectType.equalsIgnoreCase("typeAction"))
 						{
-							FunctionLibrary.typeAction(Ltype, Lvalue, TestData);;
+							FunctionLibrary.typeAction(Ltype, Lvalue, TestData);
 						}
 						if(ObjectType.equalsIgnoreCase("clickAction"))
 						{
-							FunctionLibrary.clickAction(Ltype, Lvalue);;
+							FunctionLibrary.clickAction(Ltype, Lvalue);
 						}
 						if(ObjectType.equalsIgnoreCase("validateTitle"))
 						{
-							FunctionLibrary.validateTitle(TestData);;
+							FunctionLibrary.validateTitle(TestData);
 						}
 						if(ObjectType.equalsIgnoreCase("closeBrowser"))
 						{
 							FunctionLibrary.closeBrowser();
+						}
+						if(ObjectType.equalsIgnoreCase("dropDownAction"))
+						{
+							FunctionLibrary.dropDownAction(Ltype, Lvalue, TestData);
+						}
+						if(ObjectType.equalsIgnoreCase("captureStock"))
+						{
+							FunctionLibrary.captureStock(Ltype, Lvalue);
+						}
+						if(ObjectType.equalsIgnoreCase("stockTable"))
+						{
+							FunctionLibrary.stockTable();
 						}
 						// write as pass into status cell in TCModule sheet
 						xl.setCellData(TCModule, j, 5, "Pass", outputpath);
@@ -70,7 +85,7 @@ public class DriverScript
 						System.out.println(e.getMessage());
 						xl.setCellData(TCModule, j, 5, "Fail", outputpath);
 						Module_New = "False";
-						
+
 					}
 					if(Module_Status.equalsIgnoreCase("True"))
 					{
@@ -82,14 +97,52 @@ public class DriverScript
 						// write as Fail into TCSheet in status cell
 						xl.setCellData(TCSheet, i, 3, "Fail", outputpath);
 					}
-					else
-					{
-						// write as blocked for testcases which are flag to N
-						xl.setCellData(TCSheet, i, 3, "Blocked", outputpath);
-					}
 					
 				}
 			}
+			else 
+			{
+				// write as blocked for testcases which are flag to N
+				xl.setCellData(TCSheet, i, 3, "Blocked", outputpath);
+			}
+
 		}
 	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
