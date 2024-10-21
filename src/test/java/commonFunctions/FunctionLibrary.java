@@ -3,11 +3,12 @@ package commonFunctions;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
+import java.util.Date;
 import java.util.Properties;
 
 import org.openqa.selenium.By;
@@ -21,8 +22,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.Reporter;
 
-public class FunctionLibrary 
-{
+public class FunctionLibrary {
 	public static WebDriver driver;
 	public static Properties conpro;
 	//method for launching browser
@@ -44,7 +44,6 @@ public class FunctionLibrary
 			Reporter.log("Browser value is Not Matching",true);
 		}
 		return driver;
-		
 	}
 	//method for launching url
 	public static void openUrl()
@@ -122,105 +121,180 @@ public class FunctionLibrary
 	{
 		driver.quit();
 	}
-	// method for list boxes
-		public static void dropDownAction(String LocatorType, String LocatorValue, String TestData)
+	//method for listboxes
+		public static void dropDownAction(String LocatorType,String LocatorValue,String TestData)
 		{
 			if(LocatorType.equalsIgnoreCase("xpath"))
 			{
-				// convert testdata cell into int
-				int value = Integer.parseInt(TestData);
+				//convert testData cell into int
+				int value =Integer.parseInt(TestData);
 				Select element = new Select(driver.findElement(By.xpath(LocatorValue)));
 				element.selectByIndex(value);
 			}
 			if(LocatorType.equalsIgnoreCase("name"))
 			{
-				// convert testdata cell into int
-				int value = Integer.parseInt(TestData);
+				//convert testData cell into int
+				int value =Integer.parseInt(TestData);
 				Select element = new Select(driver.findElement(By.name(LocatorValue)));
 				element.selectByIndex(value);
 			}
 			if(LocatorType.equalsIgnoreCase("id"))
 			{
-				// convert testdata cell into int
-				int value = Integer.parseInt(TestData);
+				//convert testData cell into int
+				int value =Integer.parseInt(TestData);
 				Select element = new Select(driver.findElement(By.id(LocatorValue)));
 				element.selectByIndex(value);
 			}
 		}
-	// method to capture stock number into notepad
-		public static void captureStock(String LocatorType, String LocatorValue) throws Throwable
+		//method capture stock number into notepad
+		public static void captureStock(String LocatorType,String LocatorValue) throws Throwable
 		{
-			String stockNumber = "";
+			String StockNumber="";
 			if(LocatorType.equalsIgnoreCase("xpath"))
 			{
-				stockNumber = driver.findElement(By.xpath(LocatorValue)).getAttribute("value");
+				StockNumber= driver.findElement(By.xpath(LocatorValue)).getAttribute("value");
 			}
 			if(LocatorType.equalsIgnoreCase("name"))
 			{
-				stockNumber = driver.findElement(By.name(LocatorValue)).getAttribute("value");
+				StockNumber= driver.findElement(By.name(LocatorValue)).getAttribute("value");
 			}
 			if(LocatorType.equalsIgnoreCase("id"))
 			{
-				stockNumber = driver.findElement(By.id(LocatorValue)).getAttribute("value");
+				StockNumber= driver.findElement(By.id(LocatorValue)).getAttribute("value");
 			}
-			// wriring stock number into notepad
-			FileWriter fw = new FileWriter("./CaptureData/Stocknumber.txt");
+			//writing stock number into notepad
+			FileWriter fw = new FileWriter("./CaptureData/stocknumber.txt");
 			BufferedWriter bw = new BufferedWriter(fw);
-			bw.write(stockNumber);
+			bw.write(StockNumber);
 			bw.flush();
 			bw.close();
+		}
+		//verify stock number in stock table
+		public static void stockTable()throws Throwable
+		{
+			//read path of notepad file
+			FileReader fr = new FileReader("./CaptureData/stocknumber.txt");
+			BufferedReader br = new BufferedReader(fr);
+			String Exp_Data =br.readLine();
+			//click search panel if search textbox not displayed
+			if(!driver.findElement(By.xpath(conpro.getProperty("search-textbox"))).isDisplayed())
+				//click search panel
+				driver.findElement(By.xpath(conpro.getProperty("search-panel"))).click();
+			driver.findElement(By.xpath(conpro.getProperty("search-textbox"))).clear();
+			driver.findElement(By.xpath(conpro.getProperty("search-textbox"))).sendKeys(Exp_Data);
+			driver.findElement(By.xpath(conpro.getProperty("search-button"))).click();
+			Thread.sleep(3000);
+			String Act_Data = driver.findElement(By.xpath("//table[@class='table ewTable']/tbody/tr[1]/td[8]/div/span/span")).getText();
+			Reporter.log(Exp_Data+"     "+Act_Data,true);
+			try {
+				Assert.assertEquals(Exp_Data, Act_Data,"Stock Number Not Found in Table");
+			} catch (AssertionError a) {
+				System.out.println(a.getMessage());
+			}
 			
 		}
-		// verify stock number in stock table
-			public static void stockTable() throws Throwable 
+	//method for capture supplier number into note pad
+		public static void capturesup(String LocatorType,String LocatorValue) throws Throwable
+		{
+			String supplierNum ="";
+			if(LocatorType.equalsIgnoreCase("xpath"))
 			{
-				FileReader fr = new FileReader("./CaptureData/Stocknumber.txt");
-				BufferedReader br = new BufferedReader(fr);
-				String Exp_Data = br.readLine();
-				// click search panel if search box is not displayed
-				if(!driver.findElement(By.xpath(conpro.getProperty("search-textbox"))).isDisplayed())
-					driver.findElement(By.xpath(conpro.getProperty("search-panel"))).click();
-				driver.findElement(By.xpath(conpro.getProperty("search-textbox"))).clear();
-				driver.findElement(By.xpath(conpro.getProperty("search-textbox"))).sendKeys(Exp_Data);
-				driver.findElement(By.xpath(conpro.getProperty("search-button"))).click();
-				Thread.sleep(3000);
-				String Act_Data = driver.findElement(By.xpath("//table[@class='table ewTable']/tbody/tr/td[8]/div/span/span")).getText();
-				Reporter.log(Exp_Data + "  " + Act_Data,true);
-				try {
-					Assert.assertEquals(Exp_Data, Act_Data,"stock number not found in table");
-					
-				} catch (Exception a) {
-					System.out.println(a.getMessage());
-				}
+				supplierNum = driver.findElement(By.xpath(LocatorValue)).getAttribute("value");
 			}
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
+			if(LocatorType.equalsIgnoreCase("name"))
+			{
+				supplierNum = driver.findElement(By.name(LocatorValue)).getAttribute("value");
+			}
+			if(LocatorType.equalsIgnoreCase("id"))
+			{
+				supplierNum = driver.findElement(By.id(LocatorValue)).getAttribute("value");
+			}
+			FileWriter fw = new FileWriter("./CaptureData/suppliernumber.txt");
+			BufferedWriter bw = new BufferedWriter(fw);
+			bw.write(supplierNum);
+			bw.flush();
+			bw.close();
+		}
+		//method for reading supplier number and verify in supplier table
+		public static void suppliertable() throws Throwable
+		{
+			//read supplier number from above notepad
+			FileReader fr = new FileReader("./CaptureData/suppliernumber.txt");
+			BufferedReader br = new BufferedReader(fr);
+			String Exp_Data = br.readLine();
+			if(!driver.findElement(By.xpath(conpro.getProperty("search-textbox"))).isDisplayed())
+				driver.findElement(By.xpath(conpro.getProperty("search-panel"))).click();
+			driver.findElement(By.xpath(conpro.getProperty("search-textbox"))).clear();
+			driver.findElement(By.xpath(conpro.getProperty("search-textbox"))).sendKeys(Exp_Data);
+			driver.findElement(By.xpath(conpro.getProperty("search-button"))).click();
+			Thread.sleep(3000);
+			String Act_Data = driver.findElement(By.xpath("//table[@class='table ewTable']/tbody/tr[1]/td[6]/div/span/span")).getText();
+			Reporter.log(Exp_Data+"     "+Act_Data,true);
+			try {
+				Assert.assertEquals(Act_Data, Exp_Data, "Supplier number Not Found in table");
+			} catch (AssertionError a) {
+				System.out.println(a.getMessage());
+			}
+		}
+		public static void capturecus(String LocatorType,String LocatorValue) throws Throwable
+		{
+			String customernum="";
+			if(LocatorType.equalsIgnoreCase("xpath"))
+			{
+				customernum = driver.findElement(By.xpath(LocatorValue)).getAttribute("value");
+			}
+			if(LocatorType.equalsIgnoreCase("name"))
+			{
+				customernum = driver.findElement(By.name(LocatorValue)).getAttribute("value");
+			}
+			if(LocatorType.equalsIgnoreCase("id"))
+			{
+				customernum = driver.findElement(By.id(LocatorValue)).getAttribute("value");
+			}
+			FileWriter fw = new FileWriter("./CaptureData/customernumber.txt");
+			BufferedWriter bw = new BufferedWriter(fw);
+			bw.write(customernum);
+			bw.flush();
+			bw.close();
+		}
+		public static void customertable() throws Throwable
+		{
+			FileReader fr = new FileReader("./CaptureData/customernumber.txt");
+			BufferedReader br = new BufferedReader(fr);
+			String Exp_Data =br.readLine();
+			if(!driver.findElement(By.xpath(conpro.getProperty("search-textbox"))).isDisplayed())
+				driver.findElement(By.xpath(conpro.getProperty("search-panel"))).click();
+			driver.findElement(By.xpath(conpro.getProperty("search-textbox"))).clear();
+			driver.findElement(By.xpath(conpro.getProperty("search-textbox"))).sendKeys(Exp_Data);
+			driver.findElement(By.xpath(conpro.getProperty("search-button"))).click();
+			Thread.sleep(3000);
+			String Act_Data = driver.findElement(By.xpath("//table[@class='table ewTable']/tbody/tr[1]/td[5]/div/span/span")).getText();
+			Reporter.log(Act_Data+"     "+Exp_Data,true);
+			try {
+				Assert.assertEquals(Act_Data, Exp_Data,"Customer Number Not Found in Customer table");
+			} catch (AssertionError e) {
+				System.out.println(e.getMessage());
+			}
+				
+		}
+	//method for generate date using java time stamp
+	public static String generateDate() 
+	{
+		//create new date
+		Date date = new Date();
+		//create date format
+		DateFormat df = new SimpleDateFormat("YYYY_MM_DD");
+		return df.format(date);
+	}
 }
+
+
+
+
+
+
+
+
+
+
 
